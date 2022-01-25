@@ -1,0 +1,36 @@
+ <?php 
+ function wp_get_menu_array($current_menu) {
+    $array_menu = wp_get_nav_menu_items($current_menu);
+	global $post;
+	$thePostID = $post->ID;
+    $menu = array();
+    foreach ($array_menu as $m) {
+        if (empty($m->menu_item_parent)) {
+        	if($thePostID==$m->object_id){$active='active';}else{$active='';}
+            $menu[$m->ID] = array();
+            $menu[$m->ID]['ID'] = $m->ID;
+            $menu[$m->ID]['title'] = $m->title;
+            $menu[$m->ID]['url'] = $m->url;
+            $menu[$m->ID]['status'] =$active;
+            $menu[$m->ID]['children'] = array();
+        }
+    }
+    $submenu = array();
+    foreach ($array_menu as $m) {
+    	if($thePostID==$m->object_id){$active='active';}else{$active='';}
+        if ($m->menu_item_parent) {
+            $submenu[$m->ID] = array();
+            $submenu[$m->ID]['ID'] = $m->ID;
+            $submenu[$m->ID]['title'] = $m->title;
+            $submenu[$m->ID]['url'] = $m->url;
+            $submenu[$m->ID]['status'] =$active;
+            $menu[$m->menu_item_parent]['children'][$m->ID] = $submenu[$m->ID];
+        }
+    }
+    return $menu;
+}
+                     $menu_list= wp_get_menu_array('other-link');
+                     foreach ($menu_list as $menu) 
+                              { ?>
+                        <li id="menu-item-898" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-898 <?php echo $menu['status']; ?>"><a href="<?php echo $menu['url']; ?>"><?php echo $menu['title']; ?></a></li>
+                     <?php } ?>
