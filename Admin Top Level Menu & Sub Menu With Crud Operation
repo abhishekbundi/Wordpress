@@ -1,0 +1,364 @@
+Create Menu & Sub Menu in Admin Side Wordpress
+------------------------------------------------
+function wp_recipiants_menu_page(){
+    add_menu_page( 
+        __(
+         'Recipiants', 'textdomain' ),
+        'Recipiants',
+        'manage_options',
+        'recipiants',
+        'recipiants_menu_page',
+        'dashicons-buddicons-buddypress-logo',
+        10
+    ); 
+
+    add_submenu_page("recipiants","Import data","Import Data","manage_options","import-data","import_data");
+}
+add_action( 'admin_menu', 'wp_recipiants_menu_page' );
+function recipiants_menu_page(){
+    $page_template = include(dirname( __FILE__ ) . '/inc/recipiants.php');
+    return $page_template;
+}
+function import_data(){
+$page_template = include(dirname( __FILE__ ) . '/inc/import_data.php');
+    return $page_template;
+}
+
+--------------------------------------------
+Crud Opertaion Admin Side Page Wordpress
+----------------------------------------------
+ <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css">
+ <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+ <style type="text/css">
+ .actions {margin-top: 0;}
+ a.searchPagination.active {background-color: #007bff;
+  padding: 0 !important;
+  line-height: normal !important;
+  text-align: center;
+  color: #ffffff !important;
+  border-radius: 0px;}
+  a.searchPagination{
+    background-color: #eeeeee;
+    padding: 0 !important;
+    line-height: normal !important;
+    text-align: center;
+    color: #333333 !important;
+}
+.content.c-theme-news {overflow: hidden}
+.pagination>li>a, .pagination>li>span {
+    position: relative;
+    float: left;
+    padding: 6px 12px;
+    margin-left: -1px;
+    line-height: 1.42857143;
+    color: #337ab7;
+    white-space: nowrap;
+    text-decoration: none;
+    background-color: #eeeeee;
+    border: none; 
+    display: inline-flex !important;
+    justify-content: center;
+    align-items: center;
+    width: 42px;
+    height: 42px;
+    margin: 0 2px;
+}
+@media(max-width: 767px) {
+  .pagination>li>a, .pagination>li>span {font-size: 14px; width: 35px; height: 35px;}
+  .news_form {margin: 0;}
+}
+.container {
+    background: wheat;
+    background: #fff6f6 !important;
+    margin-top: 17px;
+    padding: 10px;
+}
+.wp-core-ui select {
+    max-width:100%;
+}
+div.modal {margin-top: 100px;}
+</style>
+<?php
+global $wpdb;
+if(isset($_REQUEST['save_data']))
+{
+  $country=$_POST['country'];
+  $name=$_POST['name'];
+  $function=$_POST['function'];
+  $sending_date=$_POST['sending_date'];
+  $answer=$_POST['answer'];
+  $insert = $wpdb->query("INSERT INTO wp_recipiants(wp_recipiants.country,wp_recipiants.name,wp_recipiants.function,wp_recipiants.sendig_date,wp_recipiants.answer_received,wp_recipiants.lang) VALUES ('$country','$name','$function','$sending_date','$answer','$my_current_lang')");
+}
+if(isset($_REQUEST['update_data']))
+{
+  $country=$_POST['country'];
+  $ids=$_POST['ids'];
+  $name=$_POST['name'];
+  $function=$_POST['function'];
+  $sending_date=$_POST['sending_date'];
+  $answer=$_POST['answer'];
+  $inserts = $wpdb->query("UPDATE wp_recipiants SET wp_recipiants.country='$country',wp_recipiants.name='$name',wp_recipiants.function='$function',wp_recipiants.sendig_date='$sending_date',wp_recipiants.answer_received='$answer' WHERE wp_recipiants.id='$ids'");
+}
+
+if (isset($_GET['pageno'])) {
+  $pageno = $_GET['pageno'];
+} else {
+  $pageno =1;
+}
+$no_of_records_per_page =50;
+$offset = ($pageno-1) * $no_of_records_per_page;
+$country_list=['Österreich'];
+
+$fun_list=$wpdb->get_results("SELECT wp_recipiants.function FROM wp_recipiants GROUP by wp_recipiants.function ORDER by wp_recipiants.function ASC");
+
+if(isset($_REQUEST['function_f']))
+{
+    $wq='WHERE ';
+/*    $country_f=$_REQUEST['country_f'];*/
+    $function_f=$_REQUEST['function_f'];
+    if($country_f<>'')
+    {
+        $wq.='country='."'$country_f'";
+    }
+    if($function_f<>'')
+    {
+        $wq.=' function='."'$function_f'";
+    }
+}
+if(isset($_REQUEST['id']))
+{
+    $id=$_REQUEST['id'];
+    $insert = $wpdb->query("DELETE FROM wp_recipiants WHERE wp_recipiants.id='$id'");
+}
+?>
+<div class="container">
+  <div class="header">
+   <div class="row">
+    <div class="col-md-12">
+     <h1 style="font-size:23px;">Recipiants</h1>
+ </div>
+</div>
+</div>
+<div class="body_page">
+   <form action="" method="post">
+    <div class="row">
+     <div class="col-md-8">
+          <!-- <select name="country_f" class="form-select">
+            <option value="">Select a Country</option>
+             <?php foreach($country_list as $cl){?>
+                <option value="<?php echo $cl;?>" <?php if($cl==$country_f){echo 'selected';} ?> ><?php echo $cl; ?></option>
+            <?php } ?>
+        </select> -->
+        <select name="function_f" class="form-select">
+            <option value="">Select a Function</option>
+            <?php foreach($fun_list  as $key => $fl){?>
+                <option value="<?php echo $fl->function;?>" <?php if($fl->function==$function_f){echo 'selected';} ?> ><?php echo $fl->function; ?></option>
+            <?php } ?>
+        </select>
+        <input type="submit" name="filter" value="Filter" class="btn btn-primary">
+        <a href="admin.php?page=recipiants"><button type="button" class="btn btn-secondary">Filter löschen</button></a>
+    </div>
+
+    <div class="col-md-4">
+      <button type="button" class="btn btn-primary float-right" data-toggle="modal" data-target="#add_data"><i class="fa fa-plus"></i> Add Recipiants</button>
+  </div>
+</div>
+</form>
+<div class="row">
+    <div class="col-md-12">
+       <div class="table-responsive">
+          <br>   
+          <table class="table">
+             <thead>
+                <th>Country</th>
+                <th>Name</th>
+                <th>Function</th>
+                <th>Sendig date</th>
+                <th>Answer received?Yes / No</th>
+                <th>Action</th>
+            </thead>
+            <tbody>
+                <?php 
+                if(isset($_REQUEST['filter']))
+                {
+/*                    $country_f=$_POST['country_f'];*/
+                    $function_f=$_REQUEST['function_f'];
+                    $results=$wpdb->get_results("SELECT COUNT(*) as total_recored FROM wp_recipiants ".$wq." AND wp_recipiants.lang='$my_current_lang'");
+                    $total_rows=$results[0]->total_recored;
+                    $total_pages = ceil($total_rows / $no_of_records_per_page);
+
+                    $results=$wpdb->get_results("SELECT wp_recipiants.id,wp_recipiants.country,wp_recipiants.name,wp_recipiants.function,wp_recipiants.sendig_date,wp_recipiants.answer_received,wp_recipiants.lang FROM wp_recipiants ".$wq." AND wp_recipiants.lang='$my_current_lang' ORDER by wp_recipiants.id DESC LIMIT $offset, $no_of_records_per_page"); 
+                }else
+                {
+                    $results=$wpdb->get_results("SELECT COUNT(*) as total_recored FROM wp_recipiants WHERE wp_recipiants.lang='$my_current_lang'");
+                    $total_rows=$results[0]->total_recored;
+                    $total_pages = ceil($total_rows / $no_of_records_per_page);
+
+                    $results=$wpdb->get_results("SELECT wp_recipiants.id,wp_recipiants.country,wp_recipiants.name,wp_recipiants.function,wp_recipiants.sendig_date,wp_recipiants.answer_received,wp_recipiants.lang FROM wp_recipiants WHERE wp_recipiants.lang='$my_current_lang' ORDER by wp_recipiants.id DESC LIMIT $offset, $no_of_records_per_page");
+                }
+
+                $total_data=count($results);
+                foreach($results  as $key => $row) {
+                   ?>
+                   <tr>
+                      <td><?php echo $row->country; ?></td>
+                      <td><?php echo $row->name; ?></td>
+                      <td><?php echo $row->function; ?></td>
+                      <td><?php echo $row->sendig_date;?></td>
+                      <td><?php echo $row->answer_received; ?></td>
+                      <td>
+                        <button class="btn btn-warning edit_data" id="<?php echo $row->id.','.$row->country.','.$row->name.','.$row->function.','.$row->sendig_date.','.$row->answer_received; ?>"><span class="fa fa-pencil"></span></button>
+                        <a href="admin.php?page=recipiants&id=<?php echo $row->id; ?>" class="btn btn-danger" onclick="return confirm('Are you sure you want to Remove?');"><span class="fa fa-trash"></span></a>
+                    </td>
+                </tr>
+            <?php } ?>
+        </tbody>
+    </table>
+    <div class="page_nation">
+        <?php if($total_data>=1){ ?>
+          <ul class="pagination">
+            <li class="page-item"><a href="admin.php?page=recipiants&pageno=1" class="searchPagination">«</a></li>
+            <li class="<?php if($pageno <= 1){ echo 'disabled'; } ?> page-item">
+              <a href="<?php if($pageno <= 1){ echo '#'; } else { echo "&pageno=".($pageno - 1); } ?>" class="searchPagination"><</a>
+              </li>
+              <?php
+              for($i =$pageno-1; $i<= $pageno+1; $i++) {  
+                if($i<=$total_pages&&$i>=1){
+                  if($i==$pageno){$aclass='active';}
+                  echo '<li class="page-item">';
+                  echo '<a href = "admin.php?page=recipiants&pageno=' . $i . '" class="searchPagination '.$aclass.'">' . $i . ' </a>';  
+                  echo '</li>';
+              }
+              $aclass='';
+          }    
+          ?>
+          <li class="<?php if($pageno >= $total_pages){ echo 'disabled'; } ?> page-item">
+            <a href="<?php if($pageno >= $total_pages){ echo '#'; } else { echo "admin.php?page=recipiants&pageno=".($pageno + 1); } ?>" class="searchPagination" >></a>
+        </li>
+        <li class="page-item"><a href="admin.php?page=recipiants&pageno=<?php echo $total_pages; ?>" class="searchPagination">»</a></li>
+    </ul>
+<?php }else
+{ ?>
+    <div class="l-row-restricted">
+      <div class="toolbar">
+        <p class="empty">There are no results matching</p>
+    </div>
+</div>
+<?php }
+?>
+</div>
+
+
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="modal" id="add_data">
+  <div class="modal-dialog">
+     <div class="modal-content">
+        <div class="modal-header">
+           <h4 class="modal-title">Recipiants</h4>
+           <button type="button" class="close" data-dismiss="modal">&times;</button>
+       </div>
+       <div class="modal-body">
+           <form action="" method="post">
+              <div class="form-group">
+                 <select name="country" class="form-control">
+                    <?php foreach($country_list as $cl){?>
+                        <option value="<?php echo $cl;?>"><?php echo $cl; ?></option>
+                    <?php }?>
+                </select>
+            </div>
+            <div class="form-group">
+             <input type="text" name="name" placeholder="Name" class="form-control" required>
+         </div>
+         <div class="form-group">
+             <select name="function" class="form-control">
+                <?php foreach($fun_list  as $key => $fl){?>
+                    <option value="<?php echo $fl->function;?>" <?php if($fl->function==$function_f){echo 'selected';} ?> ><?php echo $fl->function; ?></option>
+                <?php } ?>
+            </select>
+        </div>
+        <div class="form-group">
+         <input type="text" name="sending_date" class="form-control" placeholder="Date" required>
+     </div>
+     <div class="form-group">
+         <select name="answer" class="form-control">
+            <option value="">Select Answer Received</option>
+            <option value="Ja">Ja</option>
+            <option value="Nein">Nein</option>
+        </select>
+    </div>
+</div>
+<div class="modal-footer">
+ <input type="submit" name="save_data" value="Save" class="btn btn-success">
+ <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+</div>
+</form>
+</div>
+</div>
+</div>
+
+<div class="modal" id="edit_data">
+  <div class="modal-dialog">
+     <div class="modal-content">
+        <div class="modal-header">
+           <h4 class="modal-title">Edit Recipiants</h4>
+           <button type="button" class="close" data-dismiss="modal">&times;</button>
+       </div>
+       <div class="modal-body">
+           <form action="" method="post">
+              <div class="form-group">
+                 <select name="country" id="country"  class="form-control">
+                    <?php foreach($country_list as $cl){?>
+                        <option value="<?php echo $cl;?>"><?php echo $cl; ?></option>
+                    <?php }?>
+                </select>
+            </div>
+            <div class="form-group">
+             <input type="text" name="name" placeholder="Name" id="name" class="form-control" required>
+         </div>
+         <div class="form-group">
+             <select name="function" id="function" class="form-control">
+                <?php foreach($fun_list  as $key => $fl){?>
+                    <option value="<?php echo $fl->function;?>" <?php if($fl->function==$function_f){echo 'selected';} ?> ><?php echo $fl->function; ?></option>
+                <?php } ?>
+            </select>
+        </div>
+        <div class="form-group">
+         <input type="text" name="sending_date" id="sending_date" class="form-control" required>
+     </div>
+     <div class="form-group">
+         <select name="answer" id="answer" class="form-control">
+            <option value="">Select Answer Received</option>
+            <option value="Ja">Ja</option>
+            <option value="Nein">Nein</option>
+        </select>
+    </div>
+</div>
+<div class="modal-footer">
+ <input type="submit" name="update_data" value="Update" class="btn btn-success">
+ <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+</div>
+<input type="hidden" name="ids" id="id">
+</form>
+</div>
+</div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js"></script>
+<script type="text/javascript">
+    $(".edit_data").click(function(){
+        var id=$(this).attr('id');
+        const e_data= id.split(",");
+        $("#name").val(e_data[2]);
+        $("#sending_date").val(e_data[4]);
+        $("#id").val(e_data[0]);
+        $('#country').val(e_data[1]).change();
+        $('#function').val(e_data[3]).change();
+        $('#answer').val(e_data[5]).change();
+        $("#edit_data").modal('show');
+    })
+</script>
