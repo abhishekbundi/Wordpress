@@ -1,0 +1,3 @@
+<video id="myVideo" autoplay="" muted="" playsinline="" data-wf-ignore="true" data-object-fit="cover" loop>
+    <source src="<?php echo $banner_video; ?>" data-wf-ignore="true" />
+</video>
