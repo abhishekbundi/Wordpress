@@ -1,0 +1,6 @@
+function jaipur_scripts() {
+	wp_enqueue_style('jaipur-style', get_template_directory_uri().'/assets/css/bootstrap.min.css');
+	wp_enqueue_script('jaipur-script', get_template_directory_uri() .'/assets/js/bootstrap.min.js');
+	wp_enqueue_script('jaipur-script', get_template_directory_uri() .'/assets/js/jquery.min.js');
+}
+add_action('wp_enqueue_scripts', 'jaipur_scripts');
