@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <style>
+    #map {
+        height: 400px;
+        width: 100%;
+    }
+</style>
+<script>
+    var map;
+    var InforObj = [];
+    var centerCords = {
+        lat: -25.344,
+        lng: 131.036
+    };
+    var markersOnMap = [{
+        title: "Piso completo en tranquila urbanización",
+        image: 'https://livingmad.es/wp-content/uploads/2020/04/LivingMad-Pisos-Madrid-Valderrey-VD37-3-Salon-1.jpg',
+        url:'https://livingmad.es/piso-completo-en-tranquila-urbanizacion-vd37/',
+        LatLng: [{
+            lat: -25.344,
+            lng: 131.036
+        }]
+    },
+    {
+        title: "Espectacular piso en el centro de Madrid",
+        image: 'https://livingmad.es/wp-content/uploads/2020/03/LivingMad-Pisos-Madrid-Arrieta-Portada.png',
+        url:'https://livingmad.es/espectacular-piso-en-centro-de-madrid-ar13/',
+        LatLng: [{
+            lat: -37.852086,
+            lng: 504.985963
+        }]
+    }
+    ];
+    window.onload = function () {
+        initMap();
+    };
+    function addMarkerInfo() {
+        for (var i = 0; i < markersOnMap.length; i++) {
+            var contentString = '<div id="content"><a href="'+ markersOnMap[i].url +'"><img src="'+ markersOnMap[i].image +'" style="width:100%;height:200px;"><h3>' + markersOnMap[i].title +
+            '</h3></a></div>';
+            const marker = new google.maps.Marker({
+                position: markersOnMap[i].LatLng[0],
+                map: map
+            });
+            const infowindow = new google.maps.InfoWindow({
+                content: contentString,
+                maxWidth: 200
+            });
+            marker.addListener('click', function () {
+                closeOtherInfo();
+                infowindow.open(marker.get('map'), marker);
+                InforObj[0] = infowindow;
+            });
+                /*marker.addListener('mouseover', function () {
+                    closeOtherInfo();
+                    infowindow.open(marker.get('map'), marker);
+                    InforObj[0] = infowindow;
+                });
+                marker.addListener('mouseout', function () {
+                    closeOtherInfo();
+                    infowindow.close();
+                    InforObj[0] = infowindow;
+                });*/
+            }
+        }
+        function closeOtherInfo() {
+            if (InforObj.length > 0) {
+                InforObj[0].set("marker", null);
+                InforObj[0].close();
+                InforObj.length = 0;
+            }
+        }
+        function initMap() {
+            map = new google.maps.Map(document.getElementById('map'), {
+                zoom: 4,
+                center: centerCords
+            });
+            addMarkerInfo();
+        }
+    </script>
+</head>
+<body>
+    <div id="map"></div>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCamoTLfHE5l0BVrQArP1n-3Vfo8OpQ8us"></script>
+
+</body>
+
+</html>
