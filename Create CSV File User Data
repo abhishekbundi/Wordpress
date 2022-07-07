@@ -1,0 +1,22 @@
+$args = array(
+    'role'    => 'administrator',
+);
+$users = get_users( $args );
+$filename = ABSPATH . 'wp-content/themes/storefront/test_file.csv';
+$fields=['First Name','Last Name','Email','Accepts Email Marketing','Company','Address1
+','Address2','City','Province','Province Code','Country','Country Code','Zip','Phone','Accepts SMS Marketing','Total Spent','Total Orders','Tags','Note','Tax Exempt'];
+$fp = fopen($filename, 'w');
+fputcsv($fp, $fields);
+foreach ( $users as $user ) {
+	$u_id=$user->ID;
+	$email=$user->user_email;
+	$roles=$user->roles;
+	
+	 $user_info = get_user_meta($u_id);
+ 			 $first_name=$user_info['first_name'][0];
+ 			 $last_name=$user_info['last_name'][0];
+ 	$fields=[$first_name,$last_name,$email,'no','','Address1
+','Address2','City','Province','Province Code','Country','Country Code','Zip','Phone','no','Total Spent','Total Orders',$roles[0],'Note','Tax Exempt'];
+fputcsv($fp, $fields);
+}
+fclose($fp);
